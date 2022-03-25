@@ -1,6 +1,7 @@
 // ========== Import ==========
 const express = require('express')
 const mongoose = require('mongoose');
+const cors = require('cors');
 const bodyParser = require('body-parser')
 const AccountRoute = require('./routes/account_route')
 const CartRoute = require('./routes/cart_route')
@@ -13,6 +14,7 @@ const PORT = process.env.PORT
 const DB_URL = process.env.DB_URL
 
 // ========== Use Middleware ========== 
+app.use(cors())
 app.use(bodyParser.json())
 app.use('/account', AccountRoute)
 app.use('/cart', CartRoute)
