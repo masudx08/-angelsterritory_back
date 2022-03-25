@@ -1,7 +1,9 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const Binance = require('node-binance-api');
 const CartModel = require('../models/cart_model')
 const CartRoute = express.Router()
+const binance = new Binance()
 // ============ Generate Cart ==============
 
 const OneMinute = 1000*60
@@ -11,6 +13,7 @@ const HalfHour = 1000*60*30
 const OneHour = 1000*60*60
 const OneDay = 1000*60*60*24
 
+let btcPrice 
 CartRoute.get('/', (req, res)=>{
   CartModel.find().exec((err, result)=>{
     console.log(result)
@@ -19,29 +22,50 @@ CartRoute.get('/', (req, res)=>{
   
 })
 
-function generateCart(currency, activeTime){
-  const Cart = new CartModel({
-    currency,
-    activeTime,
-    totalPool: 0,
-    startTime: new Date(),
-    lockedPrice: 0,
-    closedPrice: 0,
-    upPool: 0,
-    downPool: 0,
-    upPayout: 0,
-    downPayout: 0
-  })
-  Cart.save(err=>{
-    if(err){
-      console.log(err)
-    }
-  })
-}
+// binance.futuresMiniTickerStream( 'BTCUSDT', (res)=>{
+//   btcPrice = res.close
+//   console.log(res)
+// } );
 
-// setInterval(()=>{
+// One Minute Generate 
+var currentId 
+setInterval(()=>{
+  binance.futuresMarkPrice("BTCUSDT")
+  .then(btc=>{
+    const Cart = new CartModel({
+      currency: 'BTC',
+      activeTime: OneMinute,
+      startTime: new Date(),
+      lockedPrice: btc.indexPrice
+    })
+
+    Cart.save(function(err, res){
+      if(err){
+        console.log(err)
+      }else{
+        const id = res._id+''
+        currentId = id
+        console.log('saved')
+      }
+    })
+
+    if(currentId){
+      const filter = {_id:currentId}
+      const update = {
+        stopTime: new Date(),
+        closedPrice: btc.indexPrice
+      }
+      CartModel.findOneAndUpdate(filter, update)
+      .then(res=>{
+        console.log('updated')
+      })
+    }
+
+  })
   
-// },OneMinute)
+  
+  
+},OneMinute)
 
 
 // setInterval(()=>{},FiveMinute)

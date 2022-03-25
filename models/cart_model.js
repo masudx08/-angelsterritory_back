@@ -2,14 +2,12 @@ const mongoose = require('mongoose')
 
 const CartSchema = mongoose.Schema({
   currency: String,
-  totalPool: Number,
   startTime: Date,
   lockedPrice: Number,
   closedPrice: Number,
   upPool: Number,
   downPool: Number,
-  upPayout: Number,
-  downPayout: Number
+  stopTime: Date
 })
 
 
