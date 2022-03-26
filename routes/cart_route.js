@@ -85,7 +85,6 @@ function generateCart(props){
 }
 
 // One Minute Generate 
-
 setInterval(()=>{
   generateCart({
     currency : 'BTC',

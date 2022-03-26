@@ -8,11 +8,12 @@ const cartOptions = {
 const CartSchema = mongoose.Schema({
   currency: String,
   startTime: Date,
+  stopTime: Date,
+  activeTime: Number,
   lockedPrice: Number,
   closedPrice: Number,
   upPool: Number,
   downPool: Number,
-  stopTime: Date
 }, cartOptions)
 
 CartSchema.virtual('totalPool').get(function(){
