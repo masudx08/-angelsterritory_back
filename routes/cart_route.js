@@ -85,20 +85,20 @@ function generateCart(props){
 }
 
 // One Minute Generate 
-setInterval(()=>{
-  generateCart({
-    currency : 'BTC',
-    activeTime: OneMinute
-  })
-  generateCart({
-    currency : 'ETH',
-    activeTime: OneMinute
-  })
-  generateCart({
-    currency : 'BNB',
-    activeTime: OneMinute
-  })
-},OneMinute)
+// setInterval(()=>{
+//   generateCart({
+//     currency : 'BTC',
+//     activeTime: OneMinute
+//   })
+//   generateCart({
+//     currency : 'ETH',
+//     activeTime: OneMinute
+//   })
+//   generateCart({
+//     currency : 'BNB',
+//     activeTime: OneMinute
+//   })
+// },OneMinute)
 
 
 // setInterval(()=>{},FiveMinute)
