@@ -23,7 +23,7 @@ UserRoute.post('/login', (req, res)=>{
       const jwtAccessToken = jwt.sign({ email: result.email, id:result._id, role: result.role}, process.env.JWT_SECRET)
       res.status(200).send({
         message: 'Successfully logged in',
-        jwtAccessToken : 'Bearer '+jwtAccessToken
+        jwtAccessToken: 'Bearer '+jwtAccessToken
       })
     } else {
       res.status(401).send({
