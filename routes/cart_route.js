@@ -1,7 +1,9 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const Binance = require('node-binance-api');
-const CartModel = require('../models/cart_model')
+const { authorizer } = require('../middleware/middleware');
+const CartModel = require('../models/cart_model');
+const historyModel = require('../models/history_model');
 const CartRoute = express.Router()
 const binance = new Binance()
 // ============ Generate Cart ==============
@@ -17,12 +19,30 @@ const OneDay = 1000*60*60*24
 
 
 
-CartRoute.post('/:id', (req, res)=>{
+
+CartRoute.post('/:id', authorizer, (req, res)=>{
+  console.log(req.user)
   if(req.body.upPool){
     CartModel.findOne({_id:req.params.id}, function(err, result){
+      const history = new historyModel({
+        contestId : req.params.id,
+        type: 'trade',
+        status: 'live',
+        date: new Date(),
+        contractType: '1Min',
+        amount: req.body.upPool,
+        currency: 'BTC',
+        fee: 1,
+        feeCurrency: 'USDT',
+        cart: req.params.id,
+        user: req.user.id,
+      })
       result.upPool = Number(req.body.upPool) + Number(result.upPool)
       result.save(()=>{
         res.status(200).send({message:'done'})
+        history.save((err, response)=>{
+          console.log(response)
+        })
       })
     })
   }

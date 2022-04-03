@@ -5,7 +5,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 const UserRoute = require('./routes/user_route')
 const CartRoute = require('./routes/cart_route')
-const ConfigRoute = require('./routes/config_route')
+const ConfigRoute = require('./routes/config_route');
+const HistoryRoute = require('./routes/history_route');
+const { authorizer } = require('./middleware/middleware');
 require('dotenv').config()
 
 // ========== Declare Variable ========== 
@@ -18,6 +20,7 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use('/user', UserRoute)
 app.use('/cart', CartRoute)
+app.use('/history', HistoryRoute)
 app.use('/config', ConfigRoute)
 
 // ========== DB Connection ========== 
