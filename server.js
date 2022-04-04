@@ -8,6 +8,7 @@ const CartRoute = require('./routes/cart_route')
 const ConfigRoute = require('./routes/config_route');
 const HistoryRoute = require('./routes/history_route');
 const { authorizer } = require('./middleware/middleware');
+const WalletRoute = require('./routes/wallet_route');
 require('dotenv').config()
 
 // ========== Declare Variable ========== 
@@ -21,6 +22,7 @@ app.use(bodyParser.json())
 app.use('/user', UserRoute)
 app.use('/cart', CartRoute)
 app.use('/history', HistoryRoute)
+app.use('/wallet', WalletRoute)
 app.use('/config', ConfigRoute)
 
 // ========== DB Connection ========== 

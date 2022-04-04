@@ -8,7 +8,12 @@ Content-Type: application/json
 }
 
 ###
-
-GET http://localhost:5555/history HTTP/1.1
+POST http://localhost:5555/wallet HTTP/1.1
 token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhbmEwMjg1MTFAZ21haWwuY29tIiwiaWQiOiI2MjQ2NWNjOTYwNTI3YzEzNTU2ZDFkOWUiLCJyb2xlIjoidXNlciIsImlhdCI6MTY0ODgyNjYyMX0.3Gzq0T6HqbjwJZJ13FVAHQlvIstRuf_BzC4z3_3pNWs
+Content-Type: application/json
 
+{
+  "to": "promasud225@gmail.com",
+  "amount": 10,
+  "currency": "ETH"
+}
