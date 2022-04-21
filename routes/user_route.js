@@ -5,15 +5,16 @@ const  bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const UserModel = require('../models/user_model');
 const { authorizer } = require('../middleware/middleware');
+const WalletModel = require('../models/wallet_model');
 var salt = bcrypt.genSaltSync(10);
 
 UserRoute.get('/', authorizer, (req,res)=>{
-  UserModel.findOne({_id:req.user.id},{password:0}, (err, result)=>{
-    if(!err){
+  UserModel.findOne({_id:req.user.id},{password:0}).populate('wallet')
+  .then(result=>{
       res.send(result)
-    }else{
-      res.sendStatus(403)
-    }
+  })
+  .catch(err=>{
+    res.sendStatus(403)
   })
 })
 
@@ -35,18 +36,28 @@ UserRoute.post('/login', (req, res)=>{
 
 UserRoute.post('/register', (req, res)=>{
   const password = bcrypt.hashSync(req.body.password, salt);
-  const User = new UserModel({
+  
+  const Wallet = new WalletModel({
     email: req.body.email, 
-    password: password, 
-    role: 'user'
+    USDT: 0
   })
-  User.save((err, result)=>{
-    if(!err){
-      res.send({mesage: 'registered', result})
-    }else{
-      console.log(err)
-    }
+  Wallet.save((err, result)=>{
+    const User = new UserModel({
+      name:'David',
+      email: req.body.email, 
+      password: password, 
+      role: 'user',
+      wallet: result._id
+    })
+    User.save((err, result)=>{
+      if(!err){
+        res.send({mesage: 'registered', result})
+      }else{
+        console.log(err)
+      }
+    })
   })
+  
 })
 
 

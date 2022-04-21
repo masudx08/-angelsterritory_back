@@ -1,9 +1,10 @@
 const mongoose  = require('mongoose')
 
 const walletSchema = mongoose.Schema({
-  email: String,
-  BTC: Number,
-  ETH: Number,
+  email: {
+    type: String,
+    unique: true
+  },
   USDT: Number
 })
 

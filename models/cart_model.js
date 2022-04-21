@@ -21,11 +21,11 @@ CartSchema.virtual('totalPool').get(function(){
 })
 CartSchema.virtual('upPayout').get(function(){
  const fee = this.totalPool * 0.03
-  return  (this.totalPool - fee)/ this.upPool
+  return  (this.totalPool - fee)/ this.upPool || 0
 })
 CartSchema.virtual('downPayout').get(function(){
   const fee = this.totalPool * 0.03
-  return  (this.totalPool - fee)/ this.downPool
+  return  (this.totalPool - fee)/ this.downPool || 0
 })
 
 const CartModel = mongoose.model('Cart', CartSchema)

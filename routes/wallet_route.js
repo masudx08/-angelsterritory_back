@@ -12,6 +12,12 @@ const WalletRoute = express.Router()
 // wallet.save((err, res)=>{
 //   console.log(res)
 // })
+WalletRoute.get('/',authorizer, (req, res)=>{
+  WalletModel.findOne({ email: req.user.email })
+  .then(result=>{
+    console.log(result)
+  })
+})
 
 WalletRoute.post('/', authorizer, (req, res) => {
   const from = req.user.email

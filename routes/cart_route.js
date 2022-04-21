@@ -4,6 +4,7 @@ const Binance = require('node-binance-api');
 const { authorizer } = require('../middleware/middleware');
 const CartModel = require('../models/cart_model');
 const historyModel = require('../models/history_model');
+const WalletModel = require('../models/wallet_model');
 const CartRoute = express.Router()
 const binance = new Binance()
 // ============ Generate Cart ==============
@@ -21,7 +22,7 @@ const OneDay = 1000*60*60*24
 
 
 CartRoute.post('/:id', authorizer, (req, res)=>{
-  console.log(req.user)
+  console.log(req.body)
   if(req.body.upPool){
     CartModel.findOne({_id:req.params.id}, function(err, result){
       const history = new historyModel({
@@ -40,18 +41,45 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
       result.upPool = Number(req.body.upPool) + Number(result.upPool)
       result.save(()=>{
         res.status(200).send({message:'done'})
-        history.save((err, response)=>{
-          console.log(response)
+        WalletModel.findOne({email: req.user.email})
+        .then(wallet=>{
+          wallet.USDT = wallet.USDT - req.body.upPool
+          wallet.save()
         })
+        history.save((err, response)=>{
+          console.log('history saved')
+        })
+
       })
     })
   }
 
   if(req.body.downPool){
     CartModel.findOne({_id:req.params.id}, function(err, result){
+      const history = new historyModel({
+        contestId : req.params.id,
+        type: 'trade',
+        status: 'live',
+        date: new Date(),
+        contractType: '1Min',
+        amount: req.body.upPool,
+        currency: 'BTC',
+        fee: 1,
+        feeCurrency: 'USDT',
+        cart: req.params.id,
+        user: req.user.id,
+      })
       result.downPool = Number(req.body.downPool) + Number(result.downPool)
       result.save(()=>{
         res.status(200).send({message:'done'})
+        WalletModel.findOne({email: req.user.email})
+        .then(wallet=>{
+          wallet.USDT = wallet.USDT - req.body.downPool
+          wallet.save()
+        })
+        history.save((err, response)=>{
+          console.log('history saved')
+        })
       })
     })
   }
@@ -123,8 +151,7 @@ function generateCart(props){
 
 // setInterval(()=>{},FiveMinute)
 
-// setInterval(()=>{},FifteenMinute)
-
+// setInterval(()=>{},FifteenMinute
 
 // setInterval(()=>{},HalfHour)
 

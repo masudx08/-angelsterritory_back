@@ -17,6 +17,10 @@ const UserSchema = mongoose.Schema({
  }, 
  name: String,
  role : String,
+ wallet : {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Wallet'
+},
 }, userOptions)
 
 UserSchema.virtual('firstname').get(function(){
