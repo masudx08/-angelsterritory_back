@@ -10,6 +10,11 @@ const HistoryRoute = require('./routes/history_route');
 const { authorizer } = require('./middleware/middleware');
 const WalletRoute = require('./routes/wallet_route');
 require('dotenv').config()
+const { createServer } = require("http")
+const { Server } = require("socket.io");
+
+
+
 
 // ========== Declare Variable ========== 
 const app = express()
@@ -32,6 +37,23 @@ mongoose.connect(DB_URL, ()=>{
 });
 
 
+
+
+const httpServer = createServer()
+const io = new Server(httpServer,  {
+  cors: {
+    origin: "http://localhost:3000"
+  }
+});
+
+
+io.on('connection', (socket)=>{
+ socket.emit('wow', 'wow')
+})
+
+
+
+httpServer.listen(5000)
 app.listen(PORT, ()=>{
   console.log('Server is running with Port '+PORT)
 })

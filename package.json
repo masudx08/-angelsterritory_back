@@ -17,6 +17,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongo": "^0.1.0",
     "mongoose": "^6.2.8",
-    "node-binance-api": "^0.13.1"
+    "node-binance-api": "^0.13.1",
+    "socket.io": "^4.4.1"
   }
 }
