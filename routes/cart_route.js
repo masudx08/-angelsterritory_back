@@ -44,6 +44,7 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
       })
       result.upPool = Number(req.body.upPool) + Number(result.upPool)
       result.save(()=>{
+        socket.emit('updatedCart',  true)
         res.status(200).send({message:'done'})
         WalletModel.findOne({email: req.user.email})
         .then(wallet=>{
@@ -75,6 +76,7 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
       })
       result.downPool = Number(req.body.downPool) + Number(result.downPool)
       result.save(()=>{
+        socket.emit('updatedCart',  true)
         res.status(200).send({message:'done'})
         WalletModel.findOne({email: req.user.email})
         .then(wallet=>{
