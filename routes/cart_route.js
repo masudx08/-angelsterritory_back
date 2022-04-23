@@ -15,14 +15,15 @@ const FifteenMinute = 1000*60*15
 const HalfHour = 1000*60*30
 const OneHour = 1000*60*60
 const OneDay = 1000*60*60*24
-
-
-
-
-
+function cartSocket(io){
+  io.on('connection', socket=>{
+    binance.futuresMiniTickerStream('BTCUSDT', ticker=>{
+      socket.emit('btcStream', ticker)
+    });
+  })
+}
 
 CartRoute.post('/:id', authorizer, (req, res)=>{
-  console.log(req.body)
   if(req.body.upPool){
     CartModel.findOne({_id:req.params.id}, function(err, result){
       const history = new historyModel({
@@ -85,7 +86,10 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
   }
 })
 
+let io
+
 CartRoute.get('/', (req, res)=>{
+ 
   CartModel.find().exec((err, result)=>{
     res.send(result)
   })
@@ -169,4 +173,4 @@ function generateCart(props){
 // })
 
 
-module.exports = CartRoute
+module.exports = {CartRoute, cartSocket}
