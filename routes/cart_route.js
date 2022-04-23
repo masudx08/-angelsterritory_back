@@ -9,20 +9,22 @@ const CartRoute = express.Router()
 const binance = new Binance()
 // ============ Generate Cart ==============
 
-const OneMinute = 1000*60
+const OneMinute = 1000*20
 const FiveMinute = 1000*60*5
 const FifteenMinute = 1000*60*15
 const HalfHour = 1000*60*30
 const OneHour = 1000*60*60
 const OneDay = 1000*60*60*24
-
+let socket
 function cartSocket(io){
-  io.on('connection', socket=>{
-    binance.futuresMiniTickerStream('BTCUSDT', ticker=>{
-      socket.emit('btcStream', ticker)
+  io.on('connection', sock=>{
+    socket = sock
+    binance.futuresMarkPriceStream('BTCUSDT', ticker=>{
+      socket.emit('btcStream', ticker.indexPrice)
     });
   })
 }
+
 
 CartRoute.post('/:id', authorizer, (req, res)=>{
   if(req.body.upPool){
@@ -87,7 +89,6 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
   }
 })
 
-let io
 
 CartRoute.get('/', (req, res)=>{
  
@@ -97,6 +98,7 @@ CartRoute.get('/', (req, res)=>{
 })
 
 function generateCart(props){
+ 
   binance.futuresMarkPrice(props.currency+"USDT")
   .then(coin=>{
     const Cart = new CartModel({
@@ -112,6 +114,7 @@ function generateCart(props){
       if(err){
         console.log(err)
       }else{
+        socket.emit('updatedCart',  true)
         const id = res._id+''
         console.log('saved')
         setTimeout(function(){
@@ -125,6 +128,7 @@ function generateCart(props){
                 .then(()=>{
                   console.log('updated')
                 })
+                socket.emit('updatedCart',  true)
              })
             setTimeout(()=>{
               CartModel.deleteOne({_id:id}, (result)=>{
@@ -143,10 +147,10 @@ function generateCart(props){
 
 // One Minute Generate 
 setInterval(()=>{
-  generateCart({
-    currency : 'BTC',
-    activeTime: OneMinute
-  })
+  // generateCart({
+  //   currency : 'BTC',
+  //   activeTime: OneMinute
+  // })
   // generateCart({
   //   currency : 'ETH',
   //   activeTime: OneMinute
