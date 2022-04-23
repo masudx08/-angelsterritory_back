@@ -15,6 +15,7 @@ const FifteenMinute = 1000*60*15
 const HalfHour = 1000*60*30
 const OneHour = 1000*60*60
 const OneDay = 1000*60*60*24
+
 function cartSocket(io){
   io.on('connection', socket=>{
     binance.futuresMiniTickerStream('BTCUSDT', ticker=>{
@@ -125,7 +126,11 @@ function generateCart(props){
                   console.log('updated')
                 })
              })
-            
+            setTimeout(()=>{
+              CartModel.deleteOne({_id:id}, (result)=>{
+                console.log('deleted', id)
+              })
+            }, props.activeTime*3)
             
           }
         }, props.activeTime)
@@ -137,20 +142,20 @@ function generateCart(props){
 }
 
 // One Minute Generate 
-// setInterval(()=>{
-//   generateCart({
-//     currency : 'BTC',
-//     activeTime: OneMinute
-//   })
-//   generateCart({
-//     currency : 'ETH',
-//     activeTime: OneMinute
-//   })
-//   generateCart({
-//     currency : 'BNB',
-//     activeTime: OneMinute
-//   })
-// },OneMinute)
+setInterval(()=>{
+  generateCart({
+    currency : 'BTC',
+    activeTime: OneMinute
+  })
+  // generateCart({
+  //   currency : 'ETH',
+  //   activeTime: OneMinute
+  // })
+  // generateCart({
+  //   currency : 'BNB',
+  //   activeTime: OneMinute
+  // })
+},OneMinute)
 
 
 // setInterval(()=>{},FiveMinute)
