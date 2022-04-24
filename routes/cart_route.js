@@ -1,29 +1,27 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const Binance = require('node-binance-api');
+
+const { Server } = require('socket.io');
 const { authorizer } = require('../middleware/middleware');
 const CartModel = require('../models/cart_model');
 const historyModel = require('../models/history_model');
 const WalletModel = require('../models/wallet_model');
 const CartRoute = express.Router()
+const Binance = require('node-binance-api');
 const binance = new Binance()
 // ============ Generate Cart ==============
-
-const OneMinute = 1000*20
+const OneMinute = 1000*60
 const FiveMinute = 1000*60*5
 const FifteenMinute = 1000*60*15
 const HalfHour = 1000*60*30
 const OneHour = 1000*60*60
 const OneDay = 1000*60*60*24
+
 let socket
-function cartSocket(io){
-  io.on('connection', sock=>{
-    socket = sock
-    binance.futuresMarkPriceStream('BTCUSDT', ticker=>{
-      socket.emit('btcStream', ticker.indexPrice)
-    });
-  })
+function cartSocket(sock){
+  socket = sock
 }
+
 
 
 CartRoute.post('/:id', authorizer, (req, res)=>{
@@ -44,7 +42,9 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
       })
       result.upPool = Number(req.body.upPool) + Number(result.upPool)
       result.save(()=>{
-        socket.emit('updatedCart',  true)
+        if(socket){
+          socket.emit('updatedCart',  true)
+        }
         res.status(200).send({message:'done'})
         WalletModel.findOne({email: req.user.email})
         .then(wallet=>{
@@ -76,7 +76,9 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
       })
       result.downPool = Number(req.body.downPool) + Number(result.downPool)
       result.save(()=>{
-        socket.emit('updatedCart',  true)
+        if(socket){
+          socket.emit('updatedCart',  true)
+        }
         res.status(200).send({message:'done'})
         WalletModel.findOne({email: req.user.email})
         .then(wallet=>{
@@ -116,7 +118,8 @@ function generateCart(props){
       if(err){
         console.log(err)
       }else{
-        socket.emit('updatedCart',  true)
+       
+        
         const id = res._id+''
         console.log('saved')
         setTimeout(function(){
@@ -130,7 +133,9 @@ function generateCart(props){
                 .then(()=>{
                   console.log('updated')
                 })
-                socket.emit('updatedCart',  true)
+                if(socket){
+                  socket.emit('updatedCart',  true)
+                }
              })
             setTimeout(()=>{
               CartModel.deleteOne({_id:id}, (result)=>{
@@ -149,10 +154,10 @@ function generateCart(props){
 
 // One Minute Generate 
 setInterval(()=>{
-  // generateCart({
-  //   currency : 'BTC',
-  //   activeTime: OneMinute
-  // })
+  generateCart({
+    currency : 'BTC',
+    activeTime: OneMinute
+  })
   // generateCart({
   //   currency : 'ETH',
   //   activeTime: OneMinute

@@ -12,7 +12,8 @@ const WalletRoute = require('./routes/wallet_route');
 require('dotenv').config()
 const { createServer } = require("http")
 const { Server } = require("socket.io");
-
+const Binance = require('node-binance-api');
+const binance = new Binance()
 
 
 
@@ -29,7 +30,6 @@ const io = new Server(httpServer,  {
   }
 });
 
-cartSocket(io)
 
 app.use((req, res, next)=>{
   req.io= io
@@ -53,7 +53,24 @@ mongoose.connect(DB_URL, ()=>{
 
 
 
-
+io.on('connection', socket=>{
+  cartSocket(socket)
+  binance.futuresMarkPriceStream('BTCUSDT', ticker=>{
+    if(ticker != "undefined" ){
+      socket.emit('btcStream', ticker?.indexPrice)
+    }
+  })
+  binance.futuresMarkPriceStream('ETHUSDT', ticker=>{
+    if(ticker != "undefined" ){
+      socket.emit('ethStream', ticker?.indexPrice)
+    }
+  })
+  binance.futuresMarkPriceStream('BNBUSDT', ticker=>{
+    if(ticker != "undefined" ){
+      socket.emit('bnbStream', ticker?.indexPrice)
+    }
+  })
+})
 
 
 
@@ -64,8 +81,11 @@ mongoose.connect(DB_URL, ()=>{
 
 
 
-httpServer.listen(5000)
-app.listen(PORT, ()=>{
+ const socketServer = httpServer.listen(5000)
+// socketServer.keepAliveTimeout = 61000 * 1000;
+
+const expressServer = app.listen(PORT, ()=>{
   console.log('Server is running with Port '+PORT)
 })
+// expressServer.keepAliveTimeout = 61000 * 1000;
 
