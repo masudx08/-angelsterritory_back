@@ -8,14 +8,20 @@ const historyModel = require('../models/history_model');
 const WalletModel = require('../models/wallet_model');
 const CartRoute = express.Router()
 const Binance = require('node-binance-api');
+const { JsonWebTokenError } = require('jsonwebtoken');
 const binance = new Binance()
 // ============ Generate Cart ==============
-const OneMinute = 1000*60
-const FiveMinute = 1000*60*5
-const FifteenMinute = 1000*60*15
-const HalfHour = 1000*60*30
-const OneHour = 1000*60*60
-const OneDay = 1000*60*60*24
+const OneMinute = 1000*10
+const FiveMinute = 1000*20
+const FifteenMinute = 1000*30
+
+
+// const OneMinute = 1000*60
+// const FiveMinute = 1000*60*5
+// const FifteenMinute = 1000*60*15
+// const HalfHour = 1000*60*30
+// const OneHour = 1000*60*60
+// const OneDay = 1000*60*60*24
 
 let socket
 function cartSocket(sock){
@@ -95,8 +101,9 @@ CartRoute.post('/:id', authorizer, (req, res)=>{
 
 
 CartRoute.get('/', (req, res)=>{
- 
-  CartModel.find().exec((err, result)=>{
+  const options = JSON.parse(req.headers.options)
+  CartModel.find({currency:options.selectedCoin, activeTime: options.selectedTime})
+  .exec((err, result)=>{
     res.send(result)
   })
 })
@@ -153,31 +160,51 @@ function generateCart(props){
 }
 
 // One Minute Generate 
-setInterval(()=>{
-  generateCart({
-    currency : 'BTC',
-    activeTime: OneMinute
-  })
-  // generateCart({
-  //   currency : 'ETH',
-  //   activeTime: OneMinute
-  // })
-  // generateCart({
-  //   currency : 'BNB',
-  //   activeTime: OneMinute
-  // })
-},OneMinute)
+// setInterval(()=>{
+//   generateCart({
+//     currency : 'BTC',
+//     activeTime: OneMinute
+//   })
+//   generateCart({
+//     currency : 'ETH',
+//     activeTime: OneMinute
+//   })
+//   generateCart({
+//     currency : 'BNB',
+//     activeTime: OneMinute
+//   })
+// },OneMinute)
+
+// setInterval(()=>{
+//   generateCart({
+//     currency : 'BTC',
+//     activeTime: FiveMinute
+//   })
+//   generateCart({
+//     currency : 'ETH',
+//     activeTime: FiveMinute
+//   })
+//   generateCart({
+//     currency : 'BNB',
+//     activeTime: FiveMinute
+//   })
+// },FiveMinute)
+// setInterval(()=>{
+//   generateCart({
+//     currency : 'BTC',
+//     activeTime: FifteenMinute
+//   })
+//   generateCart({
+//     currency : 'ETH',
+//     activeTime: FifteenMinute
+//   })
+//   generateCart({
+//     currency : 'BNB',
+//     activeTime: FifteenMinute
+//   })
+// },FifteenMinute)
 
 
-// setInterval(()=>{},FiveMinute)
-
-// setInterval(()=>{},FifteenMinute
-
-// setInterval(()=>{},HalfHour)
-
-// setInterval(()=>{},OneHour)
-
-// setInterval(()=>{},OneDay)
 
   
 
