@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const historySchema = new  mongoose.Schema({
   contestId: String,
   type: String,
+  bet: String,
   status: String,
   date : Date,
   contractType: String,
