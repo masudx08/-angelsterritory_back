@@ -70,7 +70,7 @@ CartRoute.post("/:id", authorizer, (req, res) => {
         status: "live",
         date: new Date(),
         contractType: "1Min",
-        amount: req.body.upPool,
+        amount: req.body.downPool,
         currency: "BTC",
         fee: 1,
         feeCurrency: "USDT",
@@ -144,6 +144,8 @@ function generateCart(props) {
                         console.log('up')
                         WalletModel.findOne({ email: item.user.email }).then(
                           (wallet) => {
+                            console.log(wallet.USDT, typeof wallet.USDT, 'walletusdt')
+                            console.log(item.amount, typeof item.amount, 'amount of item')
                             wallet.USDT = Number(wallet.USDT) + (Number(item.amount) * 2);
                             wallet.save()
                             socket.emit("update", true);
