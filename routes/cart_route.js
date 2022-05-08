@@ -47,7 +47,7 @@ CartRoute.post("/:id", authorizer, (req, res) => {
       result.upPool = Number(req.body.upPool) + Number(result.upPool);
       result.save(() => {
         if (socket) {
-          socket.emit("updatedCart", true);
+          socket.emit("update", true);
         }
         res.status(200).send({ message: "done" });
         WalletModel.findOne({ email: req.user.email }).then((wallet) => {
@@ -80,7 +80,7 @@ CartRoute.post("/:id", authorizer, (req, res) => {
       result.downPool = Number(req.body.downPool) + Number(result.downPool);
       result.save(() => {
         if (socket) {
-          socket.emit("updatedCart", true);
+          socket.emit("update", true);
         }
         res.status(200).send({ message: "done" });
         WalletModel.findOne({ email: req.user.email }).then((wallet) => {
@@ -144,16 +144,18 @@ function generateCart(props) {
                         console.log('up')
                         WalletModel.findOne({ email: item.user.email }).then(
                           (wallet) => {
-                            wallet.USDT = wallet.USDT + (item.amount * 2);
+                            wallet.USDT = Number(wallet.USDT) + (Number(item.amount) * 2);
                             wallet.save()
+                            socket.emit("update", true);
                           }
                         );
                       } else if (result < 0 && item.bet == "down") {
                         console.log('down')
                         WalletModel.findOne({ email: item.user.email }).then(
                           (wallet) => {
-                            wallet.USDT = wallet.USDT +( item.amount * 2);
+                            wallet.USDT = Number(wallet.USDT) +( Number(item.amount) * 2);
                             wallet.save()
+                            socket.emit("update", true);
                           }
                         );
                       }
@@ -161,7 +163,7 @@ function generateCart(props) {
                   });
               });
               if (socket) {
-                socket.emit("updatedCart", true);
+                socket.emit("update", true);
               }
             });
             setTimeout(() => {
