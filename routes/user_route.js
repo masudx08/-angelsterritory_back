@@ -9,7 +9,7 @@ const WalletModel = require('../models/wallet_model');
 var salt = bcrypt.genSaltSync(10);
 
 UserRoute.get('/', authorizer, (req,res)=>{
-  UserModel.findOne({_id:req.user.id},{password:0}).populate('wallet')
+  UserModel.findOne({_id:req.user.id}).populate('wallet')
   .then(result=>{
       res.send(result)
   })
