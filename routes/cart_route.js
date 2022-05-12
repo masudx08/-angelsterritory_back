@@ -140,6 +140,9 @@ function generateCart(props) {
                   .then((histories) => {
                     histories.forEach((item) => {
                       const result = item.cart.closedPrice - item.cart.lockedPrice;
+                      const status = result > 0 && item.bet == "up" || result < 0 && item.bet == "down" ? 'win' : 'loss'
+                      historyModel.findOneAndUpdate({_id: item._id}, {$set:{status: status }})
+                      .then(res=>console.log(res, 'status test'))
                       if (result > 0 && item.bet == "up") {
                         console.log('up')
                         WalletModel.findOne({ email: item.user.email }).then(
